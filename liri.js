@@ -1,8 +1,7 @@
 var Spotify = require("node-spotify-api");
 var request = require("request");
-// var twitter = require("twitter");
+var Twitter = require("twitter");
 
-// var twitterKeys = require("./keys.js");
 
 var liriCommand = process.argv[2];
 
@@ -16,6 +15,26 @@ var liriCommand = process.argv[2];
 //-----------------------
 
 //function handles to spotify song request
+
+var twitterRequest = function(){
+	var twitterKeys = require("./keys.js");
+
+	// console.log(twitterKeys);
+
+	var client = new Twitter(twitterKeys);
+	var params = {screen_name: 'jnguyen916'};
+
+	client.get('statuses/user_timeline', params, function(error, tweets, response) {
+		if (!error) {
+			tweets.forEach(function(value){
+				console.log("Tweet: " + value.text);
+				console.log("Date: " + value.created_at);
+				console.log("---------------------------------------------------");
+			})
+		}
+	});
+
+}
 
 var spotifyRequest = function(){
 	var songChoice = process.argv[3];
