@@ -1,4 +1,4 @@
-// var spotify = require("node-spotify-api");
+var Spotify = require("node-spotify-api");
 var request = require("request");
 // var twitter = require("twitter");
 
@@ -7,13 +7,44 @@ var request = require("request");
 var liriCommand = process.argv[2];
 
 
-//-----------------------
+//----------------------- INTERNAL KEY NOTES
 //twitter API key VkwTjSZ9471SxDi0Crpr0M0FP
 //OMDB API key eb04ce92
 
 // http://www.omdbapi.com/?apikey=[yourkey]&
 
 //-----------------------
+
+//function handles to spotify song request
+
+var spotifyRequest = function(){
+	var songChoice = process.argv[3];
+
+	var spotify = new Spotify({
+		id: '9ccd50983afa4baf8c4b72523fee68f9',
+		secret: '27cc2ae6a9694fc3976697990b91bab2'
+	});
+
+	spotify.search({ type: 'track', query: songChoice}, function(err, data) {
+		if (err) {
+			return console.log('Error occurred: ' + err);
+		}
+	
+		// console.log(data.tracks.items);
+
+		data.tracks.items.forEach(function(value){
+			console.log("Artist Name: " + value.artists[0].name);
+			console.log("Song Name: " + value.name);
+			console.log("Preview Link: " + value.preview_url);
+			console.log("Alumb Name: " + value.album.name);
+
+			console.log("---------------------------------------------------");
+
+		})
+
+	});
+}
+
 
 
 //function handles the movie request from ODB
@@ -28,9 +59,7 @@ var omdbRequest = function(){
 	request(APIrequest, function(error, response, body){
 		if (!error && response.statusCode === 200) {
 
-			// console.log(JSON.stringify(response,null,4));
 		    // Parse the body of the site and recover just the imdbRating
-		    // (Note: The syntax below for parsing isn't obvious. Just spend a few moments dissecting it).
 		    console.log("Movie Title: " + JSON.parse(body).Title);
 		    console.log("Release Year: " + JSON.parse(body).Year);
 		    console.log("IMDB Rating: " + JSON.parse(body).Ratings[0].Value);
