@@ -1,7 +1,7 @@
 var Spotify = require("node-spotify-api");
 var request = require("request");
 var Twitter = require("twitter");
-
+var fs = require("fs");
 
 var liriCommand = process.argv[2];
 
@@ -14,37 +14,15 @@ var liriCommand = process.argv[2];
 
 //-----------------------
 
-//function handles to spotify song request
 
-var twitterRequest = function(){
-	var twitterKeys = require("./keys.js");
-
-	// console.log(twitterKeys);
-
-	var client = new Twitter(twitterKeys);
-	var params = {screen_name: 'jnguyen916'};
-
-	client.get('statuses/user_timeline', params, function(error, tweets, response) {
-		if (!error) {
-			tweets.forEach(function(value){
-				console.log("Tweet: " + value.text);
-				console.log("Date: " + value.created_at);
-				console.log("---------------------------------------------------");
-			})
-		}
-	});
-
-}
-
-var spotifyRequest = function(){
-	var songChoice = process.argv[3];
-
+//function to call spotify API
+var spotifySong = function(song){
 	var spotify = new Spotify({
 		id: '9ccd50983afa4baf8c4b72523fee68f9',
 		secret: '27cc2ae6a9694fc3976697990b91bab2'
 	});
 
-	spotify.search({ type: 'track', query: songChoice}, function(err, data) {
+	spotify.search({ type: 'track', query: song}, function(err, data) {
 		if (err) {
 			return console.log('Error occurred: ' + err);
 		}
@@ -58,10 +36,56 @@ var spotifyRequest = function(){
 			console.log("Alumb Name: " + value.album.name);
 
 			console.log("---------------------------------------------------");
+			console.log("");
 
 		})
 
 	});
+}
+
+//function handles the do-what-it-says request
+var randomRequest = function(){
+	fs.readFile("random.txt","utf-8", function(err, data){
+		if (err){
+			return console.log(err);
+		}
+
+		var song = data.split(",").splice(1,1);
+		// console.log(song);
+
+		spotifySong(song);
+	})
+}
+
+
+//function handles twitter feed request
+var twitterRequest = function(){
+	var twitterKeys = require("./keys.js");
+
+	// console.log(twitterKeys);
+
+	var client = new Twitter(twitterKeys);
+	var params = {screen_name: 'jnguyen916'};
+
+	client.get('statuses/user_timeline', params, function(error, tweets, response) {
+		if (!error) {
+			tweets.forEach(function(value){
+				console.log("Tweet: " + value.text);
+				console.log("Date: " + value.created_at);
+
+				console.log("---------------------------------------------------");
+				console.log("");
+			})
+		}
+	});
+
+}
+
+//function handles the spotify song request
+var spotifyRequest = function(){
+	var songChoice = process.argv[3];
+
+	spotifySong(songChoice);
 }
 
 
@@ -87,6 +111,7 @@ var omdbRequest = function(){
 		    console.log("Movie language: " + JSON.parse(body).Language);
 		    console.log("Movie plot: " + JSON.parse(body).Plot);
 		    console.log("Actors: " + JSON.parse(body).Actors);
+		    console.log("");
 		  }
 
 	})
@@ -107,7 +132,6 @@ switch(liriCommand){
 		randomRequest();
 		break;
 	default:
-		console.log("Please select from 'my-tweets', 'spotify-this-son', 'movie-this', or 'do-what-it-says'");
+		console.log("Please select from 'my-tweets', 'spotify-this-song', 'movie-this', or 'do-what-it-says'");
 }
-
 
