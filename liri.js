@@ -50,10 +50,41 @@ var randomRequest = function(){
 			return console.log(err);
 		}
 
-		var song = data.split(",").splice(1,1);
-		// console.log(song);
+		// console.log(data.split(",")[0]);
+		liriCommand = data.split(",")[0];
+		var title = data.split(",")[1];
 
-		spotifySong(song);
+		if (liriCommand === 'spotify-this-song'){
+			spotifySong(title);
+		} else if(liriCommand === 'movie-this'){
+			var movieChoice = title;
+			// console.log(movieChoice)
+			var movieChoiceArray = movieChoice.split(" ");
+			var movie = movieChoiceArray.join("+");
+			// console.log(movie)
+			var APIrequest = "http://www.omdbapi.com/?apikey=eb04ce92&t=" + movie;
+
+			request(APIrequest, function(error, response, body){
+				if (!error && response.statusCode === 200) {
+
+				    // Parse the body of the site and recover just the imdbRating
+				    console.log("Movie Title: " + JSON.parse(body).Title);
+				    console.log("Release Year: " + JSON.parse(body).Year);
+				    console.log("IMDB Rating: " + JSON.parse(body).Ratings[0].Value);
+				    console.log("Rotten Tomaties Rating: " + JSON.parse(body).Ratings[1].Value);
+				    console.log("Country where movie was produced: " + JSON.parse(body).Country);
+				    console.log("Movie language: " + JSON.parse(body).Language);
+				    console.log("Movie plot: " + JSON.parse(body).Plot);
+				    console.log("Actors: " + JSON.parse(body).Actors);
+				    console.log("");
+				  }
+
+			})
+		} else if(liriCommand === 'my-tweets'){
+			twitterRequest();
+		}
+
+		// spotifySong(song);
 	})
 }
 
